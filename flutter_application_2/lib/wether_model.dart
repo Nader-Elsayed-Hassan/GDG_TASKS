@@ -23,7 +23,7 @@ class WetherModel {
       condition: json['current']['condition']['text'],
       iconUrl: "http:${json['current']['condition']['icon']}",
       region: json['location']['region'],
-      windDirection: json['current']['wind_dir'],
+      windDirection: json['wind_dir'],
     );
   }
 }
