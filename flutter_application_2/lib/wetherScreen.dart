@@ -16,6 +16,7 @@ class _WetherscreenState extends State<Wetherscreen> {
   late Future<Map<String, dynamic>> _weatherData;
   final TextEditingController _cityController =
       TextEditingController(text: "cairo");
+
   @override
   void initState() {
     super.initState();
@@ -23,69 +24,72 @@ class _WetherscreenState extends State<Wetherscreen> {
   }
 
   void search() {
-    _weatherData = _wetherService.fetchWeather(_cityController.text);
+    FocusScope.of(context).unfocus(); // Dismiss the keyboard
+    setState(() {
+      _weatherData = _wetherService.fetchWeather(_cityController.text);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.blue[100],
-        appBar: AppBar(
-          title: Text(
-            "wether app",
-            style: GoogleFonts.poppins(),
-          ),
-          centerTitle: true,
-          backgroundColor: Colors.blue[900],
+      backgroundColor: Colors.blue[100],
+      appBar: AppBar(
+        title: Text(
+          "Wether App",
+          style: GoogleFonts.poppins(),
         ),
-        body: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            children: [
-              TextField(
-                controller: _cityController,
-                decoration: InputDecoration(
-                  hintText: "Enter city name",
-                  suffixIcon: IconButton(
-                    onPressed: search,
-                    icon: Icon(Icons.search),
-                  ),
-                  filled: true,
-                  fillColor: Colors.white,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide.none,
-                  ),
+        centerTitle: true,
+        backgroundColor: Colors.blue[900],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          children: [
+            TextField(
+              controller: _cityController,
+              decoration: InputDecoration(
+                hintText: "Enter city name",
+                suffixIcon: IconButton(
+                  onPressed: search,
+                  icon: Icon(Icons.search),
+                ),
+                filled: true,
+                fillColor: Colors.white,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide.none,
                 ),
               ),
-              SizedBox(
-                height: 20,
-              ),
-              FutureBuilder<Map<String, dynamic>>(
-                  future: _weatherData,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const SpinKitCircle(
-                        color: Colors.blue,
-                        size: 50.0,
-                      );
-                    } else if (snapshot.hasError) {
-                      return Text("Error: ${snapshot.error}");
-                    } else if (snapshot.hasData) {
-                      final model = WetherModel.fromJson(snapshot.data!);
-                      return buildWetherCard(model: model);
-                    } else {
-                      return const Text("No data available");
-                    }
-                  }),
-            ],
-          ),
-        ));
+            ),
+            const SizedBox(height: 20),
+            FutureBuilder<Map<String, dynamic>>(
+              future: _weatherData,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const SpinKitCircle(
+                    color: Colors.blue,
+                    size: 50.0,
+                  );
+                } else if (snapshot.hasError) {
+                  return Text("Error: ${snapshot.error}");
+                } else if (snapshot.hasData) {
+                  final model = WetherModel.fromJson(snapshot.data!);
+                  return BuildWetherCard(model: model);
+                } else {
+                  return const Text("No data available");
+                }
+              },
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 
-class buildWetherCard extends StatelessWidget {
-  const buildWetherCard({
+class BuildWetherCard extends StatelessWidget {
+  const BuildWetherCard({
     super.key,
     required this.model,
   });
@@ -95,7 +99,6 @@ class buildWetherCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      // Added 'return' here
       elevation: 5,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
@@ -112,8 +115,13 @@ class buildWetherCard extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 10),
-            Image.network("${model.iconUrl}"),
+            const SizedBox(height: 10),
+            Image.network(
+              "${model.iconUrl}",
+              errorBuilder: (context, error, stackTrace) {
+                return Icon(Icons.error, size: 50, color: Colors.red);
+              },
+            ),
             Text(
               "${model.temperature}°C",
               style: GoogleFonts.poppins(
@@ -126,13 +134,6 @@ class buildWetherCard extends StatelessWidget {
               style: GoogleFonts.poppins(
                 fontSize: 24,
                 fontWeight: FontWeight.w500,
-              ),
-            ),
-            Text(
-              "${model.region}",
-              style: GoogleFonts.poppins(
-                fontSize: 18,
-                fontWeight: FontWeight.w400,
               ),
             ),
           ],

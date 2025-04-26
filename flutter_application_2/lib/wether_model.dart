@@ -4,16 +4,16 @@ class WetherModel {
   final double temperature;
   final String condition;
   final String iconUrl;
-  final String region;
-  final String windDirection;
+  // final String region;
+  // final String windDirection;
   WetherModel({
     required this.cityName,
     required this.country,
     required this.temperature,
     required this.condition,
     required this.iconUrl,
-    required this.region,
-    required this.windDirection,
+    // required this.region,
+    // required this.windDirection,
   });
   factory WetherModel.fromJson(Map<String, dynamic> json) {
     return WetherModel(
@@ -22,8 +22,8 @@ class WetherModel {
       temperature: json['current']['temp_c'],
       condition: json['current']['condition']['text'],
       iconUrl: "http:${json['current']['condition']['icon']}",
-      region: json['location']['region'],
-      windDirection: json['wind_dir'],
+      // region: json['location']['region'],
+      // windDirection: json['wind_dir'],
     );
   }
 }

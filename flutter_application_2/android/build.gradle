@@ -1,3 +1,6 @@
+plugins {
+    id 'com.gradle.build-scan' version '1.16'
+}
 allprojects {
     repositories {
         google()
@@ -15,9 +18,6 @@ subprojects {
 
 tasks.register("clean", Delete) {
     delete rootProject.buildDir
-}
-plugins {
-    id 'com.gradle.build-scan' version '1.16'
 }
 
 buildScan {
